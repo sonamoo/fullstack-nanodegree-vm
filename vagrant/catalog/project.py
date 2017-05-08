@@ -38,21 +38,33 @@ def new_course():
         return render_template('newCourse.html')
 
 
-@app.route('/courses/<int:course_id>/edit>', methods=['GET', 'POST'])
-def edit_course():
+@app.route('/courses/<int:course_id>/edit', methods=['GET', 'POST'])
+def edit_course(course_id):
+    c = session.query(Course).filter_by(id=course_id).one()
     if request.method == 'POST':
-        c = session.query(Course).filter_by(id=course_id).one()
         name = request.form['name']
         description = request.form['description']
         if name and description:
             c.name = name
             c.description = description
+            session.add(c)
+            session.commit()
             flash("The Course is edited")
-            
+            return redirect(url_for('show_courses'))
+    else:
+        return render_template('editCourse.html', course=c)
 
 
-
-    return render_template('editCourse.html')
+@app.route('/courses/<int:course_id>/delete', methods=['GET', 'POST'])
+def delete_course(course_id):
+    c = session.query(Course).filter_by(id=course_id).one()
+    if request.method == 'POST':
+        session.delete(c)
+        flash("Succesfully deleted %s" % c.name)
+        session.commit()
+        return redirect(url_for('show_courses'))
+    else:
+        return render_template('deleteCourse.html', course=c)
 
 
 if __name__ == '__main__':

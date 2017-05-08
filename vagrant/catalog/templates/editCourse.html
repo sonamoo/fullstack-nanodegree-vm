@@ -1,0 +1,13 @@
+{% extends "main.html" %}
+{% block content %}
+<div class="row">
+    <h1>Edit Course</h1>
+    <form method="post" action="{{ url_for('edit_course', course_id=course.id)}}">
+        <label for="name">Name:</label>
+        <input type="text" name="name" value="{{course.name}}"><br />
+        <label for="description">Course Description:</label>
+        <textarea name="description">{{course.description}}</textarea><br />
+        <input type="submit">
+    </form>
+</div>
+{% endblock %}

@@ -20,6 +20,8 @@
                     {{course.name}}
                     {{course.created_on}}
                     {{course.user_id}}
+                    <a href="{{url_for('edit_course', course_id=course.id)}}">Edit</a>
+                    <a href="{{url_for('delete_course', course_id=course.id)}}">Delete</a>
                 </div>
             {% endfor %}
         </div>
