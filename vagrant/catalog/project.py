@@ -31,6 +31,9 @@ def new_course():
             session.commit()
             flash('New Course %s Successfully Created' % created_course.name)
             return redirect(url_for('show_courses'))
+        else:
+            flash("We need both name and description")
+            return render_template('newCourse.html')
     else:
         return render_template('newCourse.html')
 

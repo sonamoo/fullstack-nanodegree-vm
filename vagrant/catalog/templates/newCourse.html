@@ -1,5 +1,16 @@
 <h1>Add a Course</h1>
 <a href="{{url_for('show_courses')}}">View my Courses</a>
+<div class = 'flash'>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+        {% for message in messages %}
+        <li> <strong> {{ message }} </strong> </li>
+        {% endfor %}
+    </ul>
+        {% endif %}
+    {% endwith %}
+</div>
 <form method="post" action="{{ url_for('new_course')}}">
     <label for="name">Course Name:</label>
     <input type="text" name="name"><br />
