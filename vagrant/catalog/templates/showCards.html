@@ -1,0 +1,21 @@
+{% extends "main.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12 col-sm-12">
+        <h1>{{course.name}}</h1>
+        <p>You have {{number_of_cards}} cards</p>
+    {% if cards[0] != Null%}
+        {% for card in cards %}
+            <div class="card">
+
+                {{card.name}}
+
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>You don't have any flash cards for the {{course.name}}</p>
+        <a href="{{url_for('new_card', course_id=course.id)}}">add a card</a>
+    {% endif %}
+    </div>
+</div>
+{% endblock %}

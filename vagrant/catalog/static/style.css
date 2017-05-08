@@ -1,0 +1,7 @@
+.card {
+    min-height: 150px;
+    line-height: 150px;
+    border:black solid 1px;
+    text-align: center;
+    margin-bottom: 10px;
+}

@@ -1,0 +1,9 @@
+<h1>Add a Card</h1>
+<a href="{{url_for('show_cards', course_id=course.id)}}">View Cards for {{course.name}}</a>
+<form method="post" action="{{ url_for('new_card', course_id=course.id)}}">
+    <label for="name">Card Name:</label>
+    <input type="text" name="name"><br />
+    <label for="description">Card Description:</label>
+    <textarea name="description"></textarea><br />
+    <input type="submit">
+</form>

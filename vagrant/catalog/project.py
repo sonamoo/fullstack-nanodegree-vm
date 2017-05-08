@@ -67,6 +67,30 @@ def delete_course(course_id):
         return render_template('deleteCourse.html', course=c)
 
 
+@app.route('/courses/<int:course_id>/cards')
+def show_cards(course_id):
+    cards = session.query(Card).filter_by(course_id=course_id)
+    course = session.query(Course).filter_by(id=course_id).one()
+    number_of_cards = session.query(Card).filter_by(course_id=course_id).count()
+    return render_template('showCards.html', cards=cards, course=course, number_of_cards=number_of_cards)
+
+
+@app.route('/courses/<int:course_id>/cards/new', methods=['GET', 'POST'])
+def new_card(course_id):
+    course = session.query(Course).filter_by(id=course_id).one()
+    if request.method == 'POST':
+        name = request.form['name']
+        description = request.form['description']
+        if name and description:
+            created_card = Card(name=name, description=description, course_id=course_id)
+            session.add(created_card)
+            session.commit()
+            print created_card.course_id
+            return redirect(url_for('show_cards', course_id=course.id))
+    else:
+        return render_template('newCard.html', course=course)
+
+
 if __name__ == '__main__':
   app.secret_key = 'super_secret_key'
   app.debug = True
