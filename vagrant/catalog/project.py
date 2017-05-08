@@ -71,8 +71,9 @@ def delete_course(course_id):
 def show_cards(course_id):
     cards = session.query(Card).filter_by(course_id=course_id)
     course = session.query(Course).filter_by(id=course_id).one()
+    courses = session.query(Course).order_by(asc(Course.name))
     number_of_cards = session.query(Card).filter_by(course_id=course_id).count()
-    return render_template('showCards.html', cards=cards, course=course, number_of_cards=number_of_cards)
+    return render_template('showCards.html', cards=cards, course=course, courses=courses, number_of_cards=number_of_cards)
 
 
 @app.route('/courses/<int:course_id>/cards/new', methods=['GET', 'POST'])

@@ -6,13 +6,53 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 	</head>
 	<body>
+
+        <header class="App-header">
+            <div class="container-fluid">
+                <a href="{{url_for('show_courses')}}" class="main-title">
+                Flash Card App
+                </a>
+                <div class="blog-nav">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                            <a type="button" class="btn btn-success" href="/blog/newpost">Flash Card App</a>
+                        </div>
+                        <div class="col-md-6 col-sm-12 text-right user-info">
+                            {% if user %}
+                                <a href="#">Welcome! {{user.name}}</a> |
+                                <a href="/blog/logout">Logout</a>
+                            {% endif %}
+
+                            {% if not user %}
+                            <a href="/blog/login">Login</a> |
+                            <a href="/blog/register">Register</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
         <section class="main">
-            <div class="container">
+            <div class="container-fluid">
                 {% block content %}
                 {% endblock %}
             </div>
         </section>
-	</body>
+        <footer>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="footer-nav col-xs-12 col-sm-12 col-md-12">
+                        <a href="https://www.linkedin.com/in/ericlimchicago">Created by Eric Lim</a><br><br>
+                        <a href="https://github.com/sonamoo"><img class="profile-icons" src="{{ url_for('static', filename='github-logo.svg') }}"></a>
+                        <a href="https://www.linkedin.com/in/ericlimchicago"><img class="profile-icons" src="{{ url_for('static', filename='linkedin-logo.svg') }}"></a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	</body>
+
+
 </html>
