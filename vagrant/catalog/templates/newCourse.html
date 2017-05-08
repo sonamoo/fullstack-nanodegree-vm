@@ -1,0 +1,9 @@
+<h1>Add a Course</h1>
+<a href="{{url_for('show_courses')}}">View my Courses</a>
+<form method="post" action="{{ url_for('new_course')}}">
+    <label for="name">Course Name:</label>
+    <input type="text" name="name"><br />
+    <label for="description">Course Description:</label>
+    <textarea name="description"></textarea><br />
+    <input type="submit">
+</form>
