@@ -37,6 +37,24 @@ def new_course():
     else:
         return render_template('newCourse.html')
 
+
+@app.route('/courses/<int:course_id>/edit>', methods=['GET', 'POST'])
+def edit_course():
+    if request.method == 'POST':
+        c = session.query(Course).filter_by(id=course_id).one()
+        name = request.form['name']
+        description = request.form['description']
+        if name and description:
+            c.name = name
+            c.description = description
+            flash("The Course is edited")
+            
+
+
+
+    return render_template('editCourse.html')
+
+
 if __name__ == '__main__':
   app.secret_key = 'super_secret_key'
   app.debug = True

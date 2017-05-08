@@ -1,24 +1,28 @@
 {% extends "main.html" %}
 {% block content %}
     <div class="row">
-        <h1>Courses</h1>
-        <div class = 'flash'>
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <ul>
-                {% for message in messages %}
-                <li> <strong> {{ message }} </strong> </li>
-                {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
-        </div>
-        <a href="{{url_for('new_course')}}">New Course</a>
-        {% for course in courses %}
-            <div class="courses">
-                {{course.name}}
+        <div class="col-md-12 col-sm-12">
+            <h1>Courses</h1>
+            <div class = 'flash'>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul>
+                    {% for message in messages %}
+                    <li> <strong> {{ message }} </strong> </li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
             </div>
-        {% endfor %}
+            <a href="{{url_for('new_course')}}">New Course</a>
+            {% for course in courses %}
+                <div class="courses">
+                    {{course.name}}
+                    {{course.created_on}}
+                    {{course.user_id}}
+                </div>
+            {% endfor %}
+        </div>
     </div>
 
 {% endblock %}
