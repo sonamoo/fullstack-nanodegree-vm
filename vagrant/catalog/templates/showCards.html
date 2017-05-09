@@ -3,25 +3,25 @@
 <div class="row">
     <div class="col-md-12 col-sm-12">
         <h1>{{course.name}}</h1>
-        <p>You have {{number_of_cards}} cards</p>
-        <p>view other course's cards</p>
-        {% for c in courses %}
-        <a href="{{url_for('show_cards', course_id=c.id)}}">{{c.name}}</a> |
-        {% endfor %}
-
-
-    {% if cards[0] != Null%}
-        {% for card in cards %}
-            <div class="card">
-
-                {{card.name}}
-
-            </div>
-        {% endfor %}
-    {% else %}
-        <p>You don't have any flash cards for the {{course.name}}</p>
+        <h4>other courses</h4>
+        <ol class="breadcrumb">
+            {% for c in courses %}
+            <li><a href="{{url_for('show_cards', course_id=c.id)}}">{{c.name}}</a></li>
+            {% endfor %}
+        </ol>
         <a href="{{url_for('new_card', course_id=course.id)}}">add a card</a>
-    {% endif %}
+        <br>
+        <p>You have {{number_of_cards}} cards</p>
+        <ul>
+        {% if cards[0] != Null%}
+            {% for card in cards %}
+            <li><a href="{{url_for('card_detail', card_id=card.id, course_id=course.id)}}">{{card.name}}</a></li>
+            {% endfor %}
+        </ul>
+        {% else %}
+       <p>You don't have any flash cards for the {{course.name}}</p>
+        {% endif %}
+        <br>
     </div>
 </div>
 {% endblock %}

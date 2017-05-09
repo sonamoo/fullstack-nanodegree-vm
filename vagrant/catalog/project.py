@@ -26,11 +26,15 @@ def new_course():
         name = request.form['name']
         description = request.form['description']
         if name and description:
-            created_course = Course(name=name, description=description)
-            session.add(created_course)
-            session.commit()
-            flash('New Course %s Successfully Created' % created_course.name)
-            return redirect(url_for('show_courses'))
+            if session.query(Course).filter_by(name=name):
+                flash("The %s course is already exists" % name)
+                return render_template('newCourse.html', description=description, name=name)
+            else:
+                created_course = Course(name=name, description=description)
+                session.add(created_course)
+                session.commit()
+                flash('New Course %s Successfully Created' % created_course.name)
+                return redirect(url_for('show_courses'))
         else:
             flash("We need both name and description")
             return render_template('newCourse.html')
@@ -73,7 +77,8 @@ def show_cards(course_id):
     course = session.query(Course).filter_by(id=course_id).one()
     courses = session.query(Course).order_by(asc(Course.name))
     number_of_cards = session.query(Card).filter_by(course_id=course_id).count()
-    return render_template('showCards.html', cards=cards, course=course, courses=courses, number_of_cards=number_of_cards)
+    return render_template('showCards.html', cards=cards, course=course,
+                           courses=courses, number_of_cards=number_of_cards)
 
 
 @app.route('/courses/<int:course_id>/cards/new', methods=['GET', 'POST'])
@@ -90,6 +95,14 @@ def new_card(course_id):
             return redirect(url_for('show_cards', course_id=course.id))
     else:
         return render_template('newCard.html', course=course)
+
+
+@app.route('/courses/<int:course_id>/<int:card_id>')
+def card_detail(course_id, card_id):
+    card = session.query(Card).filter_by(id=card_id).one()
+    cards = session.query(Card).order_by(asc(Card.name))
+    course = session.query(Course).filter_by(id=course_id).one()
+    return render_template('card_detail.html', course=course, card=card)
 
 
 if __name__ == '__main__':

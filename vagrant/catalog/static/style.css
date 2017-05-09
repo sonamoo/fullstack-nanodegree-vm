@@ -1,10 +1,49 @@
-.card {
-    min-height: 150px;
-    line-height: 150px;
-    border:black solid 1px;
+.flashcard {
+    height: 300px;
+    masx-width: 500px;
+    margin: 10% auto;
+    border: 1px solid gray;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
     text-align: center;
-    margin-bottom: 10px;
+    padding: 0 20px;
+    box-shadow: 1px 1px 10px #000;
+    transition: all 0.3s;
 }
+
+
+.flipped, .card-detail-description{
+    transform: rotateX(180deg);
+}
+
+.flipped {
+    box-shadow: 1px -1px 10px #000;
+}
+
+.card-detail-name {
+    font-size: 30px;
+}
+
+.card-detail-description {
+    font-size: 20px;
+    text-align: left;
+}
+
+.off {
+    display: none;
+
+}
+/*
+    height: 300px;
+    width: 500px;
+    position: absolute;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    border:black solid 1px;
+    display: none;
+    */
 
 .profile-icons {
     width : 35px;
