@@ -1,14 +1,87 @@
 {% extends "main.html" %}
 {% block content %}
+
 <div class="row">
     <div class="col-sm-12">
+        <ol class="breadcrumb">
+        {% for c in courses %}
+            <li><a href="{{url_for('show_cards', course_id=c.id)}}">{{c.name}}</a></li>
+        {% endfor %}
+        </ol>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class = 'flash'>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+
+                    {{ message }}
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+        {% endif %}
+        {% endwith %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-1">
+        <a style="display:block" href="{{url_for('card_detail', course_id=course.id, card_id=cards_id_list[card_index-1] )}}">
+            <div class="previous-div">
+               <span class="glyphicon glyphicon-triangle-left previous-button" aria-hidden="true"></span>
+            </div>
+        </a>
+    </div>
+    <div class="col-sm-10">
         <div class="flashcard">
-            <div>
-                <p class="card-detail-name">{{card.name}}</p>
+            <div class="card-detail-name">
+                <p>{{card.name}}</p>
             </div>
-            <div>
-                <p class="card-detail-description off">{{card.description}}</p>
+            <div class="card-detail-description off">
+                <p>{{card.description}}</p>
             </div>
+        </div>
+    </div>
+    <div class="col-sm-1">
+        <a style="display:block" href="{{url_for('card_detail', course_id=course.id, card_id=cards_id_list[(card_index+1)%len_of_cards] )}}">
+            <div class="next-div">
+                <span class="glyphicon glyphicon-triangle-right next-button" aria-hidden="true"></span>
+            </div>
+        </a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12">
+        <div class="other-cards">
+            <div class="previous-next-buttons">
+                <div class="previous-next-buttons2">
+                    <a href="{{url_for('card_detail', course_id=course.id, card_id=cards_id_list[card_index-1] )}}"><span class="glyphicon glyphicon-triangle-left previous-button" aria-hidden="true"></span></a>
+                    <a href="{{url_for('card_detail', course_id=course.id, card_id=cards_id_list[(card_index+1)%len_of_cards] )}}"><span class="glyphicon glyphicon-triangle-right next-button" aria-hidden="true"></span></a>
+                </div>
+            </div>
+
+            <a href="#" class="btn btn-success btn-block" id="memorized-button">Memorized</a>
+            <a href="{{url_for('delete_card', course_id=course.id, card_id=card.id)}}" class="btn btn-danger btn-block" id="delete-button">Delete</a>
+
+
+            <a href="{{url_for('edit_card', course_id=course.id, card_id=card.id)}}" class="btn btn-primary btn-block">Edit</a>
+            <a href="{{url_for('new_card', course_id=course.id)}}"  class="btn btn-primary btn-block">Add</a>
+
+            <h4>Other Cards from {{course.name}}</h4>
+            {% for c in cards%}
+                {% if c.id == card.id %}
+                <a class="btn btn-default">{{c.name}}</a>
+                {% else %}
+                <a class="btn btn-success selected-card" href="{{url_for('card_detail', course_id=course.id, card_id=c.id )}}">{{c.name}}</a>
+                {% endif %}
+
+                {% if c.name == None %}
+                <div class="alert alert-warning learn-more-alert" role="alert">
+                    <a href="#" class="alert-link ">Create more cards and learn more!</a>
+                </div>
+                {% endif %}
+            {% endfor %}
         </div>
     </div>
 </div>

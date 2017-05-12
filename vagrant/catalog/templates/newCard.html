@@ -2,6 +2,20 @@
 {% block content %}
 <div class="row">
     <div class="col-sm-12">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class = 'flash'>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+
+                    {{ message }}
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+        {% endif %}
+        {% endwith %}
         <h1>Add a Card</h1>
         <a href="{{url_for('show_cards', course_id=course.id)}}">View Cards for {{course.name}}</a>
         <form class="form-horizontal" method="post" action="{{ url_for('new_card', course_id=course.id)}}">

@@ -1,13 +1,51 @@
+a {
+    text-decoration: none;
+    color: #000;
+}
+
+a:hover {
+    text-decoration: none;
+    color: blue;
+}
+
+body {
+
+}
+
+.flash {
+    color: #3c763d;
+    background-color: #dff0d8;
+    height: 40px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    margin-bottom: 10px;
+
+}
+
+
+.main-section {
+    max-width: 700px;
+    min-height: 600px;
+    margin: 0 auto;
+}
+
+
 .flashcard {
-    height: 300px;
-    masx-width: 500px;
-    margin: 10% auto;
+    border: 1px solid black;
+    min-height: 300px;
+    max-width: 500px;
+    margin: 0 auto;
     border: 1px solid gray;
     display: flex;
     justify-content: center;
     flex-direction: column;
     text-align: center;
-    padding: 0 20px;
+    padding: 20px 20px;
     box-shadow: 1px 1px 10px #000;
     transition: all 0.3s;
 }
@@ -26,28 +64,59 @@
 }
 
 .card-detail-description {
-    font-size: 20px;
-    text-align: left;
+    font-size: 15px;
+    text-align: center;
 }
 
 .off {
     display: none;
 
 }
-/*
-    height: 300px;
-    width: 500px;
-    position: absolute;
-    flex-direction: column;
-    justify-content: center;
+
+.previous-div, .next-div {
+    margin-top: 10px;
+    border: 1px solid #efefef;
+    min-height: 300px;
     text-align: center;
-    border:black solid 1px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.next-button, .previous-button{
+    font-size: 20px;
+}
+
+.previous-button {
+
+}
+
+.other-cards {
+
+    max-width: 500px;
+    margin: 0 auto;
+    line-height: 3em;
+
+}
+
+.previous-next-buttons {
     display: none;
-    */
+
+}
+
 
 .profile-icons {
     width : 35px;
     margin : 0 10px;
+}
+
+.learn-more-alert {
+    text-align: center;
+}
+
+
+.memorized-delete-buttons-div {
+    text-align: right;
 }
 
 footer {
@@ -55,4 +124,20 @@ footer {
     min-height: 200px;
     padding: 20px;
     text-align: center;
+}
+
+@media only screen and (min-width: 150px) and (max-width: 768px) {
+    .previous-div, .next-div {
+        display: none;
+    }
+
+    .previous-next-buttons {
+        width: 200px;
+        margin: 10px auto;
+        text-align: center;
+        word-spacing: 30px;
+        display: block;
+    }
+
+
 }

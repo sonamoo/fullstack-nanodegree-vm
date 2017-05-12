@@ -2,14 +2,27 @@
 {% block content %}
 <div class="row">
     <div class="col-md-12 col-sm-12">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class = 'flash'>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+
+                    {{ message }}
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+        {% endif %}
+        {% endwith %}
         <h1>{{course.name}}</h1>
-        <h4>other courses</h4>
         <ol class="breadcrumb">
             {% for c in courses %}
             <li><a href="{{url_for('show_cards', course_id=c.id)}}">{{c.name}}</a></li>
             {% endfor %}
         </ol>
-        <a href="{{url_for('new_card', course_id=course.id)}}">add a card</a>
+        <a href="{{url_for('new_card', course_id=course.id)}}">Add</a>
         <br>
         <p>You have {{number_of_cards}} cards</p>
         <ul>

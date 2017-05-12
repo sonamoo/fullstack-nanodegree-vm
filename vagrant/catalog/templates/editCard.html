@@ -1,0 +1,29 @@
+{% extends "main.html" %}
+{% block content %}
+
+<div class="row">
+    <div class="col-sm-12">
+
+        <h1>Edit Card</h1>
+        <form class="form-horizontal" method="post" action="{{ url_for('edit_card', course_id=course.id, card_id=card.id)}}">
+            <div class="form-group">
+                <label for="name" class="col-sm-2 control-label">Card Name:</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="name" value="{{card.name}}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="description" class="col-sm-2 control-label">Card Description:</label>
+                <div class="col-sm-10">
+                    <textarea name="description" class="form-control" rows="5">{{card.description}}</textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" class="btn btn-block btn-primary">Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
