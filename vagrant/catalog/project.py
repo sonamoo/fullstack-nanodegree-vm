@@ -1,24 +1,57 @@
-from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
+from flask import Flask, render_template, request, redirect, jsonify, url_for, flash, make_response
+from flask import session as login_session
 from sqlalchemy import create_engine, asc, desc, and_
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, User, Course, Card
 
+from oauth2client.client import flow_from_clientsecrets
+from apiclient import discovery
+from oauth2client import client, crypt
+
+import hashlib
+import os
+import json
 
 
 app = Flask(__name__)
 engine = create_engine('sqlite:///flashcard.db')
 
 Base.metadata.bind = engine
-
 DBSession = sessionmaker(bind=engine)
+
 session = DBSession()
+CLIENT_ID = json.loads(open('client_secret.json', 'r').read())['web']['client_id']
+APPLICATION_NAME = 'flashcardapp'
+
+
+@app.route('/login')
+def login():
+    state = hashlib.sha256(os.urandom(1024)).hexdigest()
+    print "state: " + state
+    login_session['state'] = state
+    return render_template('login.html',
+                           STATE=state,
+                           CLIENT_ID=CLIENT_ID,
+                           APPLICATION_NAME=APPLICATION_NAME)
+
+
+@app.route('/oauth2callback', methods=['POST'])
+def gconnect():
+    print "Im here /oauth2callback"
+    if request.args.get('state') != login_session['state']:
+        response = make_response(json.dumps('Invalid state parameter.'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    code = request.data
+    print code
+    return code
 
 
 @app.route('/courses/JSON')
 def all_courses_json():
     courses = session.query(Course).all()
-    courses_list = [c.serialize for c in courses]
-    return jsonify(courses=courses_list)
+    courses_list = [course.serialize for course in courses]
+    return jsonify(Category=courses_list)
 
 
 @app.route('/courses/<course_id>/cards/JSON')

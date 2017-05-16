@@ -27,14 +27,17 @@ class Course(Base):
     created_on = Column(DateTime, default=func.now())
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
+    cards = relationship("Card")
 
     @property
     def serialize(self):
         """Return object data in easily serializable format"""
+        card_data = [card.serialize for card in self.cards]
         return {
             'id': self.id,
             'name': self.name,
-            'description': self.description
+            'description': self.description,
+            'cards': card_data
         }
 
 
