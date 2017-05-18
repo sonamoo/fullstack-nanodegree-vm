@@ -8,47 +8,43 @@
     <script src="https://apis.google.com/js/platform.js" async defer></script>
 </head>
 <body>
-<div>
-    <a href="#" onclick="signOut()">Sign out</a>
-</div>
-
-<div class="g-signin2"
-  data-scope="https://www.googleapis.com/auth/plus.login"
-  data-clientid="{{CLIENT_ID}}"
-  data-accesstype="offline"
-  data-onsuccess="onSignIn"
-  data-onfailure="onSignInFailure">
-</div>
+<div class="login">Please Login with Google Account </div>
+<div class="g-signin2" data-onsuccess="onSignIn"></div>
+<div id="result"></div>
 <script>
     function onSignIn(googleUser) {
-        console.log('googleUser: ' + googleUser);
+        // get basic profile information.
         var profile = googleUser.getBasicProfile();
-        console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+        console.log('ID: ' + profile.getId());
         console.log('Name: ' + profile.getName());
         console.log('Image URL: ' + profile.getImageUrl());
-        console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+        console.log('Email: ' + profile.getEmail());
 
+        // get id_token from auth response.
+        var id_token = googleUser.getAuthResponse().id_token;
 
         $.ajax({
             type: 'POST',
-            url: '/oauth2callback?state={{STATE}}',
+            url: '/oauth2callback?state={{STATE}}', // send the state token to the server for anti forgery
             processData: false,
-            data: authResult['code'],
-            contentType: 'application/octet-stream; charset=utf-8'
+            data: id_token, // send id_token to the server
+            contentType: 'application/octet-stream; charset=utf-8',
+            success: function (result) {
+                // Handle or verify the server response if necessary.
+                if (result) {
+                    $('#result').html('Login Successful!</br>' + result + '</br>Redirecting...');
+                    setTimeout(function () {
+                        window.location.href = "/courses";
+                    }, 4000);
+                }
+                else {
+                    $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+                }
+            }
         })
-
     }
 
 </script>
-<script>
-    function signOut() {
-        var auth2 = gapi.auth2.getAuthInstance();
-        auth2.signOut().then(function () {
-            console.log('User signed out.');
-        });
-    }
-</script>
-
 
 </body>
 </html>

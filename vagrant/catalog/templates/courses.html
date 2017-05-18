@@ -16,13 +16,15 @@
             </div>
             {% endif %}
             {% endwith %}
-            <a href="{{url_for('new_course')}}">New Course</a>
+            <a href="{{url_for('new_course')}}" class="btn btn-default add-course-button"><span class="glyphicon glyphicon-plus"></span> Add Course</a>
+            <div class="row block-space"></div>
             {% for course in courses %}
                 <div class="courses">
-                    <a href="{{url_for('show_cards', course_id=course.id)}}">{{course.name}}</a>
-                    {{course.user_id}}
-                    <a href="{{url_for('edit_course', course_id=course.id)}}">Edit</a>
-                    <a href="{{url_for('delete_course', course_id=course.id)}}">Delete</a>
+                    <span class="course-created-by">{{course.user_id}}</span>
+                    <a href="{{url_for('edit_course', course_id=course.id)}}" class="edit-delete">Edit</a>
+                    <a href="{{url_for('delete_course', course_id=course.id)}}" class="edit-delete">Delete</a>
+                    <h4><a href="{{url_for('show_cards', course_id=course.id)}}">{{course.name}}</a></h4>
+
                 </div>
             {% endfor %}
         </div>

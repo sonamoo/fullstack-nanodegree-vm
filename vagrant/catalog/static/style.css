@@ -9,7 +9,7 @@ a:hover {
 }
 
 body {
-
+    background-color: #f4f7f6;
 }
 
 .flash {
@@ -34,6 +34,31 @@ body {
     margin: 0 auto;
 }
 
+.block-space {
+    height: 40px;
+}
+
+.add-course-button {
+    float: right;
+}
+
+.courses {
+    margin-top : 5px;
+    border: 1px solid #efefef;
+    padding: 1em;
+    background-color: white;
+    box-shadow: 1px 1px 5px grey;
+}
+
+.course-created-by {
+    font-size: 13px;
+    color: #5cb85c;
+}
+
+.edit-delete {
+    float: right;
+    padding-left: 10px;
+}
 
 .flashcard {
     border: 1px solid black;
@@ -138,6 +163,4 @@ footer {
         word-spacing: 30px;
         display: block;
     }
-
-
 }

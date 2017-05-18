@@ -10,13 +10,9 @@ Base = declarative_base()
 class User(Base):
     __tablename__ = 'user'
     id = Column(Integer, primary_key=True)
-    pw_hash = Column(String, nullable=False)
     name = Column(String(250), nullable=False)
     email = Column(String(250), nullable=False)
     picture = Column(String(250))
-
-    def __repr__(self):
-        return "<User(Name: '%s', pw: '%s')>" % (self.name, self.pw_hash)
 
 
 class Course(Base):
