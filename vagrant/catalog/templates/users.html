@@ -1,0 +1,6 @@
+{% extends "main.html" %}
+{% block content %}
+    {% for user in users %}
+    {{user.name}}{{user.email}}
+    {% endfor %}
+{% endblock %}

@@ -21,7 +21,8 @@ class Course(Base):
     name = Column(String(50), nullable=False)
     description = Column(String(200))
     created_on = Column(DateTime, default=func.now())
-    user_id = Column(Integer, ForeignKey('user.id'))
+    created_by = Column(String(250), nullable=False)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
     user = relationship(User)
     cards = relationship("Card")
 
@@ -45,6 +46,7 @@ class Card(Base):
     memorized = Column(Integer)
     memorized_bool = Column(Boolean)
     created_on = Column(DateTime, default=func.now())
+    created_by = Column(String(250), nullable=False)
     course_id = Column(Integer, ForeignKey('course.id'))
     course = relationship(Course)
     user_id = Column(Integer, ForeignKey('user.id'))

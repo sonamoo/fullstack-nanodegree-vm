@@ -32,6 +32,10 @@ body {
     max-width: 700px;
     min-height: 600px;
     margin: 0 auto;
+    background-color: white;
+    padding: 20px;
+    box-shadow: 1px 1px 10px #000;
+    margin-bottom: 30px;
 }
 
 .block-space {
@@ -145,10 +149,11 @@ body {
 }
 
 footer {
-    background-color: #fafbfc;
+    background: linear-gradient(to bottom right, #F7F7F7, #EAFBFF);
     min-height: 200px;
     padding: 20px;
     text-align: center;
+
 }
 
 @media only screen and (min-width: 150px) and (max-width: 768px) {

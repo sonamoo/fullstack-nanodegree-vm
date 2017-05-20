@@ -22,6 +22,12 @@ CLIENT_ID = json.loads(open('client_secret.json', 'r').read())['web']['client_id
 APPLICATION_NAME = 'flashcardapp'
 
 
+@app.route('/users')
+def get_users():
+    users = session.query(User).all()
+    return render_template('users.html', users=users)
+
+
 @app.route('/login')
 def login():
     state = hashlib.sha256(os.urandom(1024)).hexdigest()
@@ -29,7 +35,13 @@ def login():
     login_session['state'] = state
     return render_template('login.html',
                            STATE=state,
-                           CLIENT_ID=CLIENT_ID )
+                           CLIENT_ID=CLIENT_ID)
+
+
+@app.route('/logout')
+def logout():
+    return render_template('logout.html',
+                           CLIENT_ID=CLIENT_ID)
 
 
 @app.route('/oauth2callback', methods=['POST'])
@@ -90,8 +102,12 @@ def oauth2callback():
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
 
-    user_id = get_user_id(login_session['email'])
+    print "Now wa re doing that is problematic"
+    user_id = get_user_id(login_session)
     # if this user does not existed in the database
+    print " I don't understand why user_id is None"
+    print user_id
+
     if not user_id:
         user_id = create_user(login_session) # create a user in the database
     login_session['user_id'] = user_id
@@ -102,16 +118,17 @@ def oauth2callback():
 
 @app.context_processor
 def inject_user():
-    print "context_processor"
+
     if is_user_logged_in(login_session):
         print "user is logged in."
         email = login_session['email']
         username = login_session['username']
-        user = {'username': username, 'email': email}
+        id = get_user_id(login_session)
+        user = {'username': username, 'email': email, 'id': id}
         g.user = user
-        return g.user
+        return dict(user=g.user)
     else:
-        return None
+        return dict(user=None)
 
 
 @app.route('/courses/JSON')
@@ -139,11 +156,17 @@ def all_cards():
 @app.route('/courses/')
 def show_courses():
     courses = session.query(Course).order_by(asc(Course.name))
+
     return render_template('courses.html', courses=courses)
 
 
 @app.route('/courses/new', methods=['GET', 'POST'])
 def new_course():
+    if is_user_logged_in(login_session) is False:
+        flash("You need to login to add more courses!")
+        return redirect(url_for('login'))
+
+    user = session.query(User).filter_by(id=get_user_id(login_session)).one()
     if request.method == 'POST':
         name = request.form['name']
         description = request.form['description']
@@ -157,7 +180,7 @@ def new_course():
                 flash("The %s course is already exists" % name)
                 return render_template('newCourse.html', description=description, name=name)
             else:
-                created_course = Course(name=name, description=description)
+                created_course = Course(name=name, description=description, user_id=user.id, created_by=user.name)
                 session.add(created_course)
                 session.commit()
                 flash('New Course %s Successfully Created' % created_course.name)
@@ -171,7 +194,11 @@ def new_course():
 
 @app.route('/courses/<int:course_id>/edit', methods=['GET', 'POST'])
 def edit_course(course_id):
+
     c = session.query(Course).filter_by(id=course_id).one()
+    if get_user_id(login_session) != c.user_id:
+        return "You don't own this course"
+
     if request.method == 'POST':
         name = request.form['name']
         description = request.form['description']
@@ -189,6 +216,14 @@ def edit_course(course_id):
 @app.route('/courses/<int:course_id>/delete', methods=['GET', 'POST'])
 def delete_course(course_id):
     c = session.query(Course).filter_by(id=course_id).one()
+    if is_user_logged_in(login_session) is False:
+        flash("You need to login to delete a card!")
+        return redirect(url_for('login'))
+    if get_user_id(login_session) != c.user_id:
+        print "get user id : %s" % get_user_id(login_session)
+        print  c.user_id
+        return "This course is not created by you."
+
     if request.method == 'POST':
         session.delete(c)
         flash("Succesfully deleted %s" % c.name)
@@ -210,7 +245,11 @@ def show_cards(course_id):
 
 @app.route('/courses/<int:course_id>/cards/new', methods=['GET', 'POST'])
 def new_card(course_id):
+    if is_user_logged_in(login_session) is False:
+        flash("You need to login to add more cards!")
+        return redirect(url_for('login'))
     course = session.query(Course).filter_by(id=course_id).one()
+    user = session.query(User).filter_by(id=get_user_id(login_session)).one()
     if request.method == 'POST':
         name = request.form['name']
         description = request.form['description']
@@ -224,7 +263,7 @@ def new_card(course_id):
                 flash("The %s card is already exists" % name)
                 return render_template('newCard.html', course=course, description=description, name=name)
             else:
-                created_card = Card(name=name, description=description, course_id=course_id)
+                created_card = Card(name=name, description=description, course_id=course_id, created_by=user.name, user_id=user.id)
                 session.add(created_card)
                 session.commit()
                 flash("Successfully created %s" % created_card.name)
@@ -267,6 +306,11 @@ def card_detail(course_id, card_id):
 def edit_card(course_id, card_id):
     card = session.query(Card).filter_by(id=card_id).one()
     course = session.query(Course).filter_by(id=course_id).one()
+    if is_user_logged_in(login_session) is False:
+        flash("You need to login to delete a card!")
+        return redirect(url_for('login'))
+    if get_user_id(login_session) != card.user_id:
+        return "You don't own this card"
     if card.course_id != course.id:
         flash("There is no %s card in the %s " % (card.name, course.name))
         return redirect(url_for('show_cards', course_id=course.id))
@@ -292,6 +336,10 @@ def edit_card(course_id, card_id):
 def delete_card(course_id, card_id):
     card = session.query(Card).filter_by(id=card_id).one()
     course = session.query(Course).filter_by(id=course_id).one()
+    if is_user_logged_in(login_session) is False or get_user_id(login_session) != card.user_id:
+        flash("You are not authorized to delete this card!")
+        return redirect(url_for('login'))
+
     if card.course_id != course.id:
         flash("There is no %s card in the %s " % (card.name, course.name))
         return redirect(url_for('show_cards', course_id=course.id))
@@ -322,7 +370,8 @@ def delete_card(course_id, card_id):
 @app.route('/clearSession')
 def clearSession():
     login_session.clear()
-    return "Session cleared"
+    flash("Successfully logged out")
+    return redirect(url_for('show_courses'))
 
 
 def create_user(login_session):
@@ -346,12 +395,14 @@ def is_user_logged_in(login_session):
     else:
         return True
 
-def get_user_id(email):
+
+def get_user_id(login_session):
     try:
-        user = session.query(User).filter_by(email=email).one()
+        user = session.query(User).filter_by(email=login_session['email']).one()
         return user.id
     except:
         return None
+
 
 
 if __name__ == '__main__':
