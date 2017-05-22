@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, jsonify, url_for, f
 from flask import session as login_session
 from sqlalchemy import create_engine, asc, desc, and_
 from sqlalchemy.orm import sessionmaker
-from database_setup import Base, User, Course, Card
+from database_setup import Base, User, Course, Card, MemorizedCard
 
 from oauth2client import client, crypt
 
@@ -20,6 +20,68 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 CLIENT_ID = json.loads(open('client_secret.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = 'flashcardapp'
+
+
+@app.route('/courses/<int:course_id>/<int:card_id>/memorized')
+def memorized_card(course_id, card_id):
+    course = session.query(Course).filter_by(id=course_id).one()
+    card = session.query(Card).filter_by(id=card_id).one()
+    if is_user_logged_in(login_session):
+        user_id = get_user_id(login_session)
+        if user_id == card.user_id:
+            learned_card = MemorizedCard(name=card.name, description=card.description, user_id=user_id, course_id=course_id, card_id=card_id)
+            session.add(learned_card)
+            session.commit()
+            flash("Memorized %s!" % card.name)
+            return redirect(url_for('card_detail', course_id=course.id, card_id=card.id))
+        else:
+            return "You are not authorized to do this task."
+    else:
+        flash("You need to login")
+        return redirect(url_for('login'))
+
+
+@app.route('/courses/<int:course_id>/<int:card_id>/cancelMemorized')
+def cancel_memorized_card(course_id, card_id):
+    card = session.query(Card).filter_by(id=card_id).one()
+    if is_user_logged_in(login_session):
+        user_id = get_user_id(login_session)
+
+        card_to_delete = session.query(MemorizedCard).filter(and_(MemorizedCard.card_id == card.id, MemorizedCard.user_id == user_id, MemorizedCard.course_id == course_id)).one()
+        flash("successfully un memorized!? %s" % card_to_delete.name)
+        session.delete(card_to_delete)
+        session.commit()
+        return redirect(url_for('card_detail', course_id=course_id, card_id=card_id))
+
+    else:
+        flash("You are not logged in")
+        return redirect(url_for('login'))
+
+
+@app.route('/users/<int:user_id>/memorized')
+def show_memorized_cards(user_id):
+    if is_user_logged_in(login_session):
+        if get_user_id(login_session) == user_id:
+            courses = session.query(Course).all()
+            user = get_user_info(login_session)
+
+            all_cards_list = []
+            for course in courses:
+                card_dict = {}
+                card_dict['course'] = course
+                cards_of_course_list = []
+                memorized_cards = session.query(MemorizedCard).filter(and_(MemorizedCard.user_id == user.id, MemorizedCard.course_id == course.id )).all()
+                for card in memorized_cards:
+                    cards_of_course_list.append(card)
+                card_dict['cards'] = cards_of_course_list
+                all_cards_list.append(dict(card_dict))
+            return render_template('showMemorizedCards.html', all_cards_list=all_cards_list)
+        else:
+            return "you are not authorized to see this page"
+    else:
+        flash("You need to login")
+        return redirect(url_for('login'))
+
 
 
 @app.route('/users')
@@ -156,8 +218,29 @@ def all_cards():
 @app.route('/courses/')
 def show_courses():
     courses = session.query(Course).order_by(asc(Course.name))
-
     return render_template('courses.html', courses=courses)
+
+@app.route('/cards')
+def show_all_cards():
+
+    courses = session.query(Course).order_by(asc(Course.name))
+    all_cards_list = []
+    cards_dict = {}
+
+    for course in courses:
+        cards_of_course = []
+        cards_dict['course'] = course
+
+        cards = session.query(Card).filter_by(course_id=course.id).all()
+
+
+        for card in cards:
+            cards_of_course.append(card)
+
+        cards_dict['cards'] = cards_of_course
+        all_cards_list.append(dict(cards_dict))
+
+    return render_template('cards.html', courses_list=all_cards_list)
 
 
 @app.route('/courses/new', methods=['GET', 'POST'])
@@ -220,10 +303,7 @@ def delete_course(course_id):
         flash("You need to login to delete a card!")
         return redirect(url_for('login'))
     if get_user_id(login_session) != c.user_id:
-        print "get user id : %s" % get_user_id(login_session)
-        print  c.user_id
         return "This course is not created by you."
-
     if request.method == 'POST':
         session.delete(c)
         flash("Succesfully deleted %s" % c.name)
@@ -233,7 +313,7 @@ def delete_course(course_id):
         return render_template('deleteCourse.html', course=c)
 
 
-@app.route('/courses/<int:course_id>/cards')
+@app.route('/courses/<int:course_id>/cards', methods=['GET'])
 def show_cards(course_id):
     cards = session.query(Card).filter_by(course_id=course_id)
     course = session.query(Course).filter_by(id=course_id).one()
@@ -282,24 +362,50 @@ def card_detail(course_id, card_id):
     cards = session.query(Card).filter_by(course_id=course_id).order_by(asc(Card.name))
     courses = session.query(Course).order_by(asc(Course.name))
     cards_id_list = []
-    for c in cards:
-        cards_id_list.append(c.id)
-    len_of_cards = len(cards_id_list)
-    card_index = cards_id_list.index(card.id)
-    if card.course_id != course.id:
-        flash("There is no %s card in the %s " % (card.name, course.name))
-        return redirect(url_for('show_cards', course_id=course.id))
+    # If user is logged in.
+    if is_user_logged_in(login_session):
+        user_id = get_user_id(login_session)
+        memorized_cards = get_user_memorized_cards(user_id)
+        memorized_cards_id_list = []
+        # Create list that contains original id of the card.
+        for c in memorized_cards:
+            # Verify if user owns the memorized card.
+            memorized_cards_id_list.append(c.card_id)
+        for c in cards:
+            cards_id_list.append(c.id)
+        len_of_cards = len(cards_id_list)
+        card_index = cards_id_list.index(card.id)
+        if card.course_id != course.id:
+            flash("There is no %s card in the %s " % (card.name, course.name))
+            return redirect(url_for('show_cards', course_id=course.id))
+        else:
+            return render_template('card_detail.html',
+                                   course=course,
+                                   courses=courses,
+                                   card=card,
+                                   cards=cards,
+                                   card_index=card_index,
+                                   cards_id_list=cards_id_list,
+                                   len_of_cards=len_of_cards,
+                                   memorized_cards_id_list=memorized_cards_id_list)
+    # If user is not logged in.
     else:
-        print "card_index: "
-        print card_index
-        return render_template('card_detail.html',
-                               course=course,
-                               courses=courses,
-                               card=card,
-                               cards=cards,
-                               card_index=card_index,
-                               cards_id_list=cards_id_list,
-                               len_of_cards=len_of_cards)
+        for c in cards:
+            cards_id_list.append(c.id)
+        len_of_cards = len(cards_id_list)
+        card_index = cards_id_list.index(card.id)
+        if card.course_id != course.id:
+            flash("There is no %s card in the %s " % (card.name, course.name))
+            return redirect(url_for('show_cards', course_id=course.id))
+        else:
+            return render_template('card_detail.html',
+                                   course=course,
+                                   courses=courses,
+                                   card=card,
+                                   cards=cards,
+                                   card_index=card_index,
+                                   cards_id_list=cards_id_list,
+                                   len_of_cards=len_of_cards)
 
 
 @app.route('/courses/<int:course_id>/<int:card_id>/edit', methods=['GET', 'POST'])
@@ -384,7 +490,13 @@ def create_user(login_session):
     return user.id
 
 
-def get_user_info(user_id):
+def get_user_memorized_cards(user_id):
+    memorized_cards = session.query(MemorizedCard).filter_by(user_id=user_id).all()
+    return memorized_cards
+
+
+def get_user_info(login_session):
+    user_id = get_user_id(login_session)
     user = session.query(User).filter_by(id=user_id).one()
     return user
 

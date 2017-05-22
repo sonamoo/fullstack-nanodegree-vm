@@ -1,0 +1,32 @@
+{% extends "main.html" %}
+{% block content %}
+
+<div class="row">
+    <div class="col-md-12">
+        <h3>My Memorized Cards</h3>
+        {% for card_dict in all_cards_list %}
+        <h4>{{ card_dict['course'].name}}</h4>
+        {% if card_dict['cards'] %}
+        <table class="table table-striped" style="width: 100%;">
+            <tr>
+                <th>Name</th>
+                <th>Memorized Date</th>
+            </tr>
+            {% for card in card_dict['cards'] %}
+            <tr>
+                <td style="width: 60%">{{card.name}}{{card.id}}{{card.card_id}}{{card.course_id}}{{card.user_id}}</td>
+                <td style="width: 40%">{{card.created_on}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        No memorized cards in {{card_dict['course'].name}}
+        {% endif %}
+        <hr>
+        {% endfor %}
+
+
+    </div>
+</div>
+
+{% endblock %}

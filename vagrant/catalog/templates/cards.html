@@ -1,0 +1,14 @@
+{% extends "main.html" %}
+{% block content %}
+{% for course in courses_list %}
+    <h3>{{course['course'].name}}<small> created_by {{course['course'].created_by}}</small></h3>
+
+    <div id="all-cards-names">
+    {% for card in course['cards'] %}
+
+    <a href="{{url_for('card_detail', course_id=course['course'].id, card_id=card.id)}}" class="btn btn-default">{{card.name}}</a>
+    {% endfor %}
+    </div>
+{% endfor %}
+
+{% endblock %}
