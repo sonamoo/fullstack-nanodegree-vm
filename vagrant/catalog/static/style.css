@@ -62,6 +62,12 @@ body {
     color: #5cb85c;
 }
 
+.created-on {
+    font-size: 12px;
+    color: gray;
+}
+
+
 .edit-delete {
     float: right;
     padding-left: 10px;

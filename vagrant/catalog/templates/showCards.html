@@ -22,7 +22,7 @@
             <li><a href="{{url_for('show_cards', course_id=c.id)}}">{{c.name}}</a></li>
             {% endfor %}
         </ol>
-        <a href="{{url_for('new_card', course_id=course.id)}}">Add</a>
+        <a href="{{url_for('new_card', course_id=course.id)}}" class="btn btn-primary add-course-button"><span class="glyphicon glyphicon-plus"></span> Add Card</a>
         <br>
         <p>You have {{number_of_cards}} cards</p>
         <ul>
@@ -32,7 +32,7 @@
             {% endfor %}
         </ul>
         {% else %}
-       <p>You don't have any flash cards for the {{course.name}}</p>
+        <p>You don't have any flash card for the {{course.name}}</p>
         {% endif %}
         <br>
     </div>

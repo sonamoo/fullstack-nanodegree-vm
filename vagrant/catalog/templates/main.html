@@ -43,8 +43,8 @@
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                        aria-expanded="false"> {{user.username}} <span class="caret"></span></a>
                     <ul class="dropdown-menu">
-                        <li><a href="#">My Courses</a></li>
-                        <li><a href="#">My Cards</a></li>
+                        <li><a href="{{url_for('my_courses', user_id=user.id)}}">My Courses</a></li>
+                        <li><a href="{{url_for('my_cards', user_id=user.id)}}">My Cards</a></li>
                         <li><a href="{{url_for('show_memorized_cards', user_id=user.id)}}">Memorized Cards</a></li>
                     </ul>
                 </li>
