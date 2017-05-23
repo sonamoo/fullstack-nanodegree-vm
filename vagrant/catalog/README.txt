@@ -11,9 +11,9 @@ increase the usability of this app.
 ## Components
 - Flask
 - SQLAlchemy
+- Google Sign-In
 - Bootstrap
 - JQuery
-
 
 ## Requirements
 - [Vagrant](https://www.vagrantup.com/)
@@ -26,4 +26,6 @@ increase the usability of this app.
 - Move to the /vagrant
 - Run `vagrant up`
 - Run 'vagrant ssh'
-- Run 'python '
+- Run 'python project.py'
+- Move to the http://localhost:8000/ on your favorite web browser.
+
